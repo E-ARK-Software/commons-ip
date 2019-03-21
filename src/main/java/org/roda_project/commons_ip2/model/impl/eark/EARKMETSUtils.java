@@ -30,15 +30,17 @@ import org.roda_project.commons_ip2.mets_v1_11.beans.FileType.FLocat;
 import org.roda_project.commons_ip2.mets_v1_11.beans.MdSecType;
 import org.roda_project.commons_ip2.mets_v1_11.beans.MdSecType.MdRef;
 import org.roda_project.commons_ip2.mets_v1_11.beans.Mets;
-import org.roda_project.commons_ip2.mets_v1_11.beans.OriginalMetsType.FileSec;
-import org.roda_project.commons_ip2.mets_v1_11.beans.OriginalMetsType.FileSec.FileGrp;
-import org.roda_project.commons_ip2.mets_v1_11.beans.OriginalMetsType.MetsHdr;
-import org.roda_project.commons_ip2.mets_v1_11.beans.OriginalMetsType.MetsHdr.Agent;
-import org.roda_project.commons_ip2.mets_v1_11.beans.OriginalMetsType.MetsHdr.AltRecordID;
+import org.roda_project.commons_ip2.mets_v1_11.beans.MetsType.FileSec;
+import org.roda_project.commons_ip2.mets_v1_11.beans.MetsType.FileSec.FileGrp;
+import org.roda_project.commons_ip2.mets_v1_11.beans.MetsType.MetsHdr;
+import org.roda_project.commons_ip2.mets_v1_11.beans.MetsType.MetsHdr.Agent;
+import org.roda_project.commons_ip2.mets_v1_11.beans.MetsType.MetsHdr.Agent.Note;
+import org.roda_project.commons_ip2.mets_v1_11.beans.MetsType.MetsHdr.AltRecordID;
 import org.roda_project.commons_ip2.mets_v1_11.beans.StructMapType;
 import org.roda_project.commons_ip2.model.IPAgent;
 import org.roda_project.commons_ip2.model.IPAltRecordID;
 import org.roda_project.commons_ip2.model.IPConstants;
+import org.roda_project.commons_ip2.model.IPContentType;
 import org.roda_project.commons_ip2.model.IPDescriptiveMetadata;
 import org.roda_project.commons_ip2.model.IPHeader;
 import org.roda_project.commons_ip2.model.IPMetadata;
@@ -72,8 +74,11 @@ public final class EARKMETSUtils {
     mets.setTYPE(contentType);
     mets.setLABEL(label);
     mets.setOAISPACKAGETYPE(type);
-    // FIXME 20180907 hsilva deal with OTHERCONTENTTYPESPECIFICATION
-    mets.setCONTENTTYPESPECIFICATION(contentType);
+    IPContentType ipContentType = new IPContentType(contentType);
+    mets.setCONTENTINFORMATIONTYPE(ipContentType.getType().toString());
+    if (!"".equals(ipContentType.getOtherType())) {
+      mets.setOTHERCONTENTINFORMATIONTYPE(ipContentType.getOtherType());
+    }
 
     // header
     MetsHdr header = new MetsHdr();
@@ -242,7 +247,10 @@ public final class EARKMETSUtils {
     agent.setOTHERROLE(ipAgent.getOtherRole());
     agent.setTYPE(ipAgent.getType().toString());
     agent.setOTHERTYPE(ipAgent.getOtherType());
-    agent.getNote().add(ipAgent.getNote());
+    Note note = new Note();
+    note.setValue(ipAgent.getNote());
+    note.setNOTETYPE(ipAgent.getNoteType());
+    agent.getNote().add(note);
     return agent;
   }
 

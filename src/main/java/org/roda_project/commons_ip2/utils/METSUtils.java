@@ -29,10 +29,11 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.roda_project.commons_ip2.mets_v1_11.beans.FileType;
-import org.roda_project.commons_ip2.mets_v1_11.beans.Mets;
 import org.roda_project.commons_ip2.mets_v1_11.beans.FileType.FLocat;
 import org.roda_project.commons_ip2.mets_v1_11.beans.MdSecType.MdRef;
-import org.roda_project.commons_ip2.mets_v1_11.beans.OriginalMetsType.MetsHdr.Agent;
+import org.roda_project.commons_ip2.mets_v1_11.beans.Mets;
+import org.roda_project.commons_ip2.mets_v1_11.beans.MetsType.MetsHdr.Agent;
+import org.roda_project.commons_ip2.mets_v1_11.beans.MetsType.MetsHdr.Agent.Note;
 import org.roda_project.commons_ip2.model.IPAgent;
 import org.roda_project.commons_ip2.model.IPConstants;
 import org.roda_project.commons_ip2.model.MetsWrapper;
@@ -52,7 +53,7 @@ public final class METSUtils {
     SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     factory.setResourceResolver(new ResourceResolver());
     InputStream metsSchemaInputStream = METSUtils.class
-      .getResourceAsStream(IPConstants.SCHEMA_EARK_CSIP_RELATIVE_PATH_FROM_RESOURCES);
+      .getResourceAsStream(IPConstants.SCHEMA_METS_RELATIVE_PATH_FROM_RESOURCES);
     Source metsSchemaSource = new StreamSource(metsSchemaInputStream);
     Schema schema = factory.newSchema(metsSchemaSource);
     jaxbUnmarshaller.setSchema(schema);
@@ -67,12 +68,14 @@ public final class METSUtils {
 
     if (rootMETS) {
       m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
-        "http://www.loc.gov/METS/ schemas/" + IPConstants.SCHEMA_EARK_CSIP_FILENAME
-          + " http://www.w3.org/1999/xlink schemas/" + IPConstants.SCHEMA_XLINK_FILENAME);
+        "http://www.loc.gov/METS/ schemas/" + IPConstants.SCHEMA_METS_FILENAME_WITH_VERSION
+          + " http://www.w3.org/1999/xlink schemas/" + IPConstants.SCHEMA_XLINK_FILENAME
+          + " https://dilcis.eu/XML/METS/CSIPExtensionMETS schemas/" + IPConstants.SCHEMA_EARK_CSIP_FILENAME);
     } else {
       m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
-        "http://www.loc.gov/METS/ ../../schemas/" + IPConstants.SCHEMA_EARK_CSIP_FILENAME
-          + " http://www.w3.org/1999/xlink ../../schemas/" + IPConstants.SCHEMA_XLINK_FILENAME);
+        "http://www.loc.gov/METS/ ../../schemas/" + IPConstants.SCHEMA_METS_FILENAME_WITH_VERSION
+          + " http://www.w3.org/1999/xlink ../../schemas/" + IPConstants.SCHEMA_XLINK_FILENAME
+          + " https://dilcis.eu/XML/METS/CSIPExtensionMETS ../../schemas/" + IPConstants.SCHEMA_EARK_CSIP_FILENAME);
     }
 
     try (OutputStream metsOutputStream = Files.newOutputStream(tempMETSFile)) {
@@ -105,7 +108,11 @@ public final class METSUtils {
   public static Agent createMETSAgent(IPAgent ipAgent) {
     Agent agent = new Agent();
     agent.setName(ipAgent.getName());
-    agent.getNote().add(ipAgent.getNote());
+    Note note = new Note();
+    note.setValue(ipAgent.getNote());
+    note.setNOTETYPE(ipAgent.getNoteType());
+    agent.getNote().add(note);
+
     agent.setROLE(ipAgent.getRole());
     agent.setOTHERROLE(ipAgent.getOtherRole());
     agent.setTYPE(ipAgent.getType().toString());

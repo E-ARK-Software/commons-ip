@@ -13,7 +13,6 @@ import org.roda_project.commons_ip2.mets_v1_11.beans.DivType;
 import org.roda_project.commons_ip2.mets_v1_11.beans.FileGrpType;
 import org.roda_project.commons_ip2.mets_v1_11.beans.MdSecType;
 import org.roda_project.commons_ip2.mets_v1_11.beans.Mets;
-import org.roda_project.commons_ip2.mets_v1_11.beans.OriginalMetsType.FileSec.FileGrp;
 
 public class MetsWrapper {
 
@@ -30,7 +29,7 @@ public class MetsWrapper {
   private DivType submissionsDiv;
   private DivType documentationDiv;
 
-  private FileGrp mainFileGroup;
+  private FileGrpType mainFileGroup;
 
   private FileGrpType representationsFileGroup;
   private FileGrpType schemasFileGroup;
@@ -143,11 +142,11 @@ public class MetsWrapper {
     this.dataFileGroup = dataFileGroup;
   }
 
-  public FileGrp getMainFileGroup() {
+  public FileGrpType getMainFileGroup() {
     return mainFileGroup;
   }
 
-  public void setMainFileGroup(FileGrp mainFileGroup) {
+  public void setMainFileGroup(FileGrpType mainFileGroup) {
     this.mainFileGroup = mainFileGroup;
   }
 

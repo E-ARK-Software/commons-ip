@@ -103,14 +103,14 @@ public final class IPConstants {
   public static boolean METS_ENCODE_AND_DECODE_HREF = true;
 
   // XML SChemas
-  public static final String SCHEMA_METS_FILENAME_WITH_VERSION = "mets1_11.xsd";
+  public static final String SCHEMA_METS_FILENAME_WITH_VERSION = "mets1_12.xsd";
   public static final String SCHEMA_METS_RELATIVE_PATH_FROM_RESOURCES = METS_PATH_SEPARATOR + SCHEMAS + "2"
     + METS_PATH_SEPARATOR + SCHEMA_METS_FILENAME_WITH_VERSION;
   public static final String SCHEMA_XLINK_FILENAME = "xlink.xsd";
   public static final String SCHEMA_XLINK_RELATIVE_PATH_FROM_RESOURCES = METS_PATH_SEPARATOR + SCHEMAS + "2"
     + METS_PATH_SEPARATOR + SCHEMA_XLINK_FILENAME;
   public static final String SCHEMA_XLINK_URL = "http://www.loc.gov/standards/xlink/xlink.xsd";
-  public static final String SCHEMA_EARK_CSIP_FILENAME = "E-ARK-CSIP.xsd";
+  public static final String SCHEMA_EARK_CSIP_FILENAME = "DILCISExtensionMETS.xsd";
   public static final String SCHEMA_EARK_CSIP_RELATIVE_PATH_FROM_RESOURCES = METS_PATH_SEPARATOR + SCHEMAS + "2"
     + METS_PATH_SEPARATOR + SCHEMA_EARK_CSIP_FILENAME;
 

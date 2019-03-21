@@ -4,8 +4,7 @@
 	jxb:extensionBindingPrefixes="xjc" xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:xml="http://www.w3.org/XML/1998/namespace" version="2.1">
 
-	<jxb:bindings schemaLocation="http://www.loc.gov/standards/xlink/xlink.xsd"
-		node="//xsd:attribute[@name='label']">
+	<jxb:bindings schemaLocation="xlink.xsd" node="//xsd:attribute[@name='label']">
 		<jxb:property name="xlinkLabel" />
 	</jxb:bindings>
 

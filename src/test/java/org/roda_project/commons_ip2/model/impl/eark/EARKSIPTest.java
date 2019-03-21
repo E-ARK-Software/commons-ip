@@ -107,7 +107,7 @@ public class EARKSIPTest {
     sip.setAncestors(Arrays.asList("b6f24059-8973-4582-932d-eb0b2cb48f28"));
 
     // 1.8) add an agent (SIP level)
-    IPAgent agent = new IPAgent("Agent Name", "OTHER", "OTHER ROLE", CreatorType.INDIVIDUAL, "OTHER TYPE");
+    IPAgent agent = new IPAgent("Agent Name", "OTHER", "OTHER ROLE", CreatorType.INDIVIDUAL, "OTHER TYPE","","SOFTWARE VERSION");
     sip.addAgent(agent);
 
     // 1.9) add a representation (status will be set to the default value, i.e.,

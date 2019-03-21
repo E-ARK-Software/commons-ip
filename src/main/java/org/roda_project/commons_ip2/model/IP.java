@@ -19,12 +19,12 @@ import java.util.Set;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.roda_project.commons_ip2.utils.IPException;
-import org.roda_project.commons_ip2.utils.Utils;
-import org.roda_project.commons_ip2.utils.ZipEntryInfo;
 import org.roda_project.commons_ip2.utils.IPEnums.IPStatus;
 import org.roda_project.commons_ip2.utils.IPEnums.IPType;
+import org.roda_project.commons_ip2.utils.IPException;
 import org.roda_project.commons_ip2.utils.METSEnums.CreatorType;
+import org.roda_project.commons_ip2.utils.Utils;
+import org.roda_project.commons_ip2.utils.ZipEntryInfo;
 
 public abstract class IP implements IPInterface {
 
@@ -385,7 +385,8 @@ public abstract class IP implements IPInterface {
   }
 
   public IPAgent addCreatorSoftwareAgent(String softwarename) {
-    IPAgent creatorAgent = new IPAgent(softwarename, "CREATOR", null, CreatorType.OTHER, "SOFTWARE");
+    IPAgent creatorAgent = new IPAgent(softwarename, "CREATOR", null, CreatorType.OTHER, "SOFTWARE", "",
+      "SOFTWARE VERSION");
     header.addAgent(creatorAgent);
     return creatorAgent;
   }

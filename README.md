@@ -168,12 +168,8 @@ XML Beans are used by Commons IP to manipulate METS files using Java code.
 Some changes were made to XML Schemas in order to be able to compile XML Schemas into Java classes using XJC as well as to be able to validate a XML file against its XML Schema without Internet connections.
 
 The changes are:
-* `src/main/resources/schemas/mets1_11.xsd` XLink Schema location made local (and respectively file available locally)
-* `src/main/resources/schemas/mets1_11.xjb` Bindings file created to deal with attribute name conflict between METS and XLink Schemas
-
-In order to be E-ARK Common Specification for IPs compliant, the following files were created:
-* `src/main/resources/schemas/E-ARK-CSIP.xsd` XML Schema that extends METS XML Schema (using **redefine** element). Here, **OAISPACKAGETYPE** was relaxed to optional (as opposite to his original nature **required**) for backward compatibility reasons
-* `src/main/resources/schemas/E-ARK-CSIP.xjb` Bindings file created to deal with attribute name conflict between METS and XLink Schemas
+* `src/main/resources/schemas2/mets1_12.xsd` XLink Schema location made local (and respectively file available locally)
+* `src/main/resources/schemas2/mets1_12.xjb` Bindings file created to deal with attribute name conflict between METS and XLink Schemas
 
 After Java classes are created, some changes were made to produce METS XML files well defined in terms of namespaces. Namely:
 * `src/main/java/org/roda_project/commons_ip2/mets_v1_11/beans/package-info.java` Annotations for corretly generate namespaces were added. Following is the before & then the after:
@@ -185,13 +181,14 @@ and the after
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.loc.gov/METS/", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED, xmlns = {
   @javax.xml.bind.annotation.XmlNs(prefix = "", namespaceURI = "http://www.loc.gov/METS/"),
   @javax.xml.bind.annotation.XmlNs(prefix = "xsi", namespaceURI = "http://www.w3.org/2001/XMLSchema-instance"),
+  @javax.xml.bind.annotation.XmlNs(prefix = "csip", namespaceURI = "https://dilcis.eu/XML/METS/CSIPExtensionMETS"),
   @javax.xml.bind.annotation.XmlNs(prefix = "xlink", namespaceURI = "http://www.w3.org/1999/xlink")})
 ```
 
 #### How to generate/update XML Beans
 
 ```
-xjc -npa -d src/main/java/ -p org.roda_project.commons_ip2.mets_v1_11.beans src/main/resources/schemas/E-ARK-CSIP.xsd -b src/main/resources/schemas/E-ARK-CSIP.xjb
+xjc [-npa] -d src/main/java/ -p "org.roda_project.commons_ip2.mets_v1_11.beans" src/main/resources/schemas2/mets1_12.xsd -b src/main/resources/schemas2/mets1_12.xjb
 ```
 
 ## Contributing

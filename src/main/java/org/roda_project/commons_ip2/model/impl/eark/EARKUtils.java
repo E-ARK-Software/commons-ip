@@ -25,7 +25,7 @@ import org.roda_project.commons_ip2.mets_v1_11.beans.FileType;
 import org.roda_project.commons_ip2.mets_v1_11.beans.FileType.FLocat;
 import org.roda_project.commons_ip2.mets_v1_11.beans.MdSecType.MdRef;
 import org.roda_project.commons_ip2.mets_v1_11.beans.Mets;
-import org.roda_project.commons_ip2.mets_v1_11.beans.OriginalMetsType.MetsHdr.Agent;
+import org.roda_project.commons_ip2.mets_v1_11.beans.MetsType.MetsHdr.Agent;
 import org.roda_project.commons_ip2.mets_v1_11.beans.StructMapType;
 import org.roda_project.commons_ip2.model.AIP;
 import org.roda_project.commons_ip2.model.IPConstants;
@@ -347,7 +347,9 @@ public final class EARKUtils {
       throw new ParseException("METS 'OAISPACKAGETYPE' attribute does not contain a valid package type");
     }
 
-    ip.setContentType(new IPContentType(mets.getCONTENTTYPESPECIFICATION()));
+    String type = "".equals(mets.getOTHERCONTENTINFORMATIONTYPE()) ? mets.getCONTENTINFORMATIONTYPE()
+      : mets.getOTHERCONTENTINFORMATIONTYPE();
+    ip.setContentType(new IPContentType(type));
   }
 
   protected static Mets addAgentsToMETS(Mets mets, IPInterface ip, IPRepresentation representation) {
@@ -388,32 +390,15 @@ public final class EARKUtils {
   }
 
   protected static void setRepresentationContentType(Mets mets, IPRepresentation representation) throws ParseException {
-    String contentType = mets.getCONTENTTYPESPECIFICATION();
-
+    String contentType = mets.getCONTENTINFORMATIONTYPE();
     if (StringUtils.isBlank(contentType)) {
-      throw new ParseException("METS 'CONTENTTYPESPECIFICATION' attribute does not contain any value");
+      throw new ParseException("METS 'CONTENTINFORMATIONTYPE' attribute does not contain any value");
     }
 
-    // if ("representation".equals(contentType)) {
-    // if (VALIDATION_FAIL_IF_REPRESENTATION_METS_DOES_NOT_HAVE_TWO_PARTS) {
-    // throw new ParseException(
-    // "METS 'TYPE' attribute is not valid as it should be
-    // 'representation:REPRESENTATION_TYPE'");
-    // } else {
-    // return;
-    // }
-    // }
-    //
-    // String[] contentTypeParts = contentType.split(":");
-    // if (contentTypeParts.length != 2 ||
-    // StringUtils.isBlank(contentTypeParts[0])
-    // || !"representation".equals(contentTypeParts[0]) ||
-    // StringUtils.isBlank(contentTypeParts[1])) {
-    // throw new ParseException("METS 'TYPE' attribute does not contain a valid
-    // value");
-    // }
+    if (!"".equals(mets.getOTHERCONTENTINFORMATIONTYPE())) {
+      contentType = mets.getOTHERCONTENTINFORMATIONTYPE();
+    }
 
-    // FIXME 20180907 hsilva deal with OTHERCONTENTTYPESPECIFICATION
     representation.setContentType(new RepresentationContentType(contentType));
   }
 
