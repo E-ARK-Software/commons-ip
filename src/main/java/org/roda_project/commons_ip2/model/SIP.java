@@ -28,11 +28,12 @@ public abstract class SIP extends IP {
     observers = new ArrayList<>();
   }
 
-  public SIP(String sipId, IPContentType contentType) {
+  public SIP(String sipId, IPContentType contentType, IPContentInformationType contentInformationType) {
     super();
     setId(sipId);
     setType(IPType.SIP);
     setContentType(contentType);
+    setContentInformationType(contentInformationType);
     observers = new ArrayList<>();
   }
 

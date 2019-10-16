@@ -24,6 +24,7 @@ import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda_project.commons_ip2.model.IPConstants;
+import org.roda_project.commons_ip2.model.IPContentInformationType;
 import org.roda_project.commons_ip2.model.IPContentType;
 import org.roda_project.commons_ip2.model.IPFile;
 import org.roda_project.commons_ip2.model.IPRepresentation;
@@ -60,8 +61,8 @@ public class BagitSIP extends SIP {
   /**
    * @param sipId
    */
-  public BagitSIP(String sipId, IPContentType contentType) {
-    super(sipId, contentType);
+  public BagitSIP(String sipId, IPContentType contentType, IPContentInformationType contentInformationType) {
+    super(sipId, contentType, contentInformationType);
   }
 
   /**

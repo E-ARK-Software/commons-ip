@@ -40,6 +40,10 @@ public interface IPInterface {
   IP setContentType(IPContentType contentType);
 
   IPContentType getContentType();
+  
+  IP setContentInformationType(IPContentInformationType contentInformationType);
+
+  IPContentInformationType getContentInformationType();
 
   IP setStatus(IPStatus status);
 

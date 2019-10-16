@@ -23,7 +23,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.roda_project.commons_ip2.mets_v1_11.beans.StructMapType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.StructMapType;
 import org.roda_project.commons_ip2.model.AIP;
 import org.roda_project.commons_ip2.model.IPConstants;
 import org.roda_project.commons_ip2.model.MetsWrapper;
@@ -46,6 +46,9 @@ import org.slf4j.LoggerFactory;
  * folder.
  * 
  * @author Rui Castro (rui.castro@gmail.com)
+ * 
+ * @deprecated 20191016 hsilva: this class has not been checked for CSIP V2
+ *             compliance
  */
 public class EARKAIP extends AIPWrap {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKAIP.class);
@@ -59,6 +62,7 @@ public class EARKAIP extends AIPWrap {
    */
   public EARKAIP(final AIP aip) {
     super(aip);
+    setProfile(IPConstants.COMMON_SPEC_PROFILE);
   }
 
   @Override
@@ -87,14 +91,9 @@ public class EARKAIP extends AIPWrap {
       final Map<String, ZipEntryInfo> zipEntries = getZipEntries();
       zipPath = getDirPath(destinationDirectory, fileNameWithoutExtension, false);
 
-      // 20160407 hsilva: as METS does not have an attribute 'otherType', the
-      // other type must be put in the 'type' attribute allowing this way other
-      // values besides the ones in the Enum
-      final String contentType = this.getContentType().asString();
-
       final MetsWrapper mainMETSWrapper = EARKMETSUtils.generateMETS(StringUtils.join(this.getIds(), " "),
         this.getDescription(), this.getProfile(), true, Optional.ofNullable(this.getAncestors()), null,
-        this.getHeader(), this.getType(), contentType);
+        this.getHeader(), this.getType(), this.getContentType(), this.getContentInformationType());
 
       EARKUtils.addDescriptiveMetadataToZipAndMETS(zipEntries, mainMETSWrapper, getDescriptiveMetadata(), null);
 

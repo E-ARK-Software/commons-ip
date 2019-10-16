@@ -33,7 +33,9 @@ public abstract class IP implements IPInterface {
   private IPType type;
   private IPHeader header;
 
+  // maps to mets/@type
   private IPContentType contentType;
+  private IPContentInformationType contentInformationType;
   private List<String> ancestors;
 
   private Path basePath;
@@ -53,11 +55,12 @@ public abstract class IP implements IPInterface {
 
   public IP() {
     this.setId(Utils.generateRandomAndPrefixedUUID());
-    this.profile = "http://www.eark-project.com/METS/IP.xml";
+    this.profile = "NOT_DEFINED";
     this.type = IPType.SIP;
     this.header = new IPHeader();
 
     this.contentType = IPContentType.getMIXED();
+    this.contentInformationType = IPContentInformationType.getMIXED();
     this.ancestors = new ArrayList<>();
 
     this.description = "";
@@ -162,6 +165,17 @@ public abstract class IP implements IPInterface {
   @Override
   public IPContentType getContentType() {
     return contentType;
+  }
+
+  @Override
+  public IP setContentInformationType(IPContentInformationType contentInformationType) {
+    this.contentInformationType = contentInformationType;
+    return this;
+  }
+
+  @Override
+  public IPContentInformationType getContentInformationType() {
+    return contentInformationType;
   }
 
   @Override
@@ -384,9 +398,9 @@ public abstract class IP implements IPInterface {
     }
   }
 
-  public IPAgent addCreatorSoftwareAgent(String softwarename) {
-    IPAgent creatorAgent = new IPAgent(softwarename, "CREATOR", null, CreatorType.OTHER, "SOFTWARE", "",
-      "SOFTWARE VERSION");
+  public IPAgent addCreatorSoftwareAgent(String softwareName, String softwareVersion) {
+    IPAgent creatorAgent = new IPAgent(softwareName, "CREATOR", null, CreatorType.OTHER, "SOFTWARE", softwareVersion,
+      IPAgentNoteTypeEnum.SOFTWARE_VERSION);
     header.addAgent(creatorAgent);
     return creatorAgent;
   }

@@ -16,6 +16,7 @@ public final class ValidationConstants {
   public static final String METS_IS_VALID = "METS file is valid.";
   public static final String METS_HAS_SEVERAL_STRUCT_MAPS = "METS file has several struct maps.";
   public static final String METS_HAS_ONLY_ONE_STRUCT_MAP = "METS file has one struct map.";
+  public static final String METS_AGENT_HAS_SEVERAL_NOTE_ENTRIES = "METS agent has several note entries. Only the first will be considered!";
 
   // Main mets related
   public static final String MAIN_METS_FILE_FOUND = "Main METS.xml file was found.";

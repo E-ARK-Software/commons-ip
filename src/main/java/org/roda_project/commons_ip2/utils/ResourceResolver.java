@@ -31,6 +31,8 @@ public class ResourceResolver implements LSResourceResolver {
       IPConstants.SCHEMA_METS_RELATIVE_PATH_FROM_RESOURCES);
     internalResources.put(IPConstants.SCHEMA_EARK_CSIP_FILENAME,
       IPConstants.SCHEMA_EARK_CSIP_RELATIVE_PATH_FROM_RESOURCES);
+    internalResources.put(IPConstants.SCHEMA_EARK_SIP_FILENAME,
+      IPConstants.SCHEMA_EARK_SIP_RELATIVE_PATH_FROM_RESOURCES);
     internalResources.put(IPConstants.SCHEMA_XLINK_FILENAME, IPConstants.SCHEMA_XLINK_RELATIVE_PATH_FROM_RESOURCES);
   }
 

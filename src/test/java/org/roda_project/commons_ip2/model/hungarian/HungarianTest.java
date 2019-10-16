@@ -30,15 +30,16 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda_project.commons_ip2.model.IPConstants;
+import org.roda_project.commons_ip2.model.IPContentInformationType;
 import org.roda_project.commons_ip2.model.IPContentType;
 import org.roda_project.commons_ip2.model.IPDescriptiveMetadata;
 import org.roda_project.commons_ip2.model.IPFile;
 import org.roda_project.commons_ip2.model.IPRepresentation;
 import org.roda_project.commons_ip2.model.MetadataType;
+import org.roda_project.commons_ip2.model.MetadataType.MetadataTypeEnum;
 import org.roda_project.commons_ip2.model.ParseException;
 import org.roda_project.commons_ip2.model.RepresentationStatus;
 import org.roda_project.commons_ip2.model.SIP;
-import org.roda_project.commons_ip2.model.MetadataType.MetadataTypeEnum;
 import org.roda_project.commons_ip2.model.impl.hungarian.HungarianSIP;
 import org.roda_project.commons_ip2.utils.IPException;
 import org.roda_project.commons_ip2.utils.Utils;
@@ -120,8 +121,8 @@ public class HungarianTest {
 
   private Path createFullHungarianSIP() throws IPException, InterruptedException {
     // instantiate Hungarian SIP object
-    SIP sip = new HungarianSIP(SIP_ID, IPContentType.getMIXED());
-    sip.addCreatorSoftwareAgent("RODA Commons IP");
+    SIP sip = new HungarianSIP(SIP_ID, IPContentType.getMIXED(), IPContentInformationType.getMIXED());
+    sip.addCreatorSoftwareAgent("RODA Commons IP", "2.0.0");
 
     // set optional human-readable description
     sip.setDescription("A full Hungarian SIP");

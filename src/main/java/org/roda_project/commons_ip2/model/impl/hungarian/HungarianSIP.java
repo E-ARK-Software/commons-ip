@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda_project.commons_ip2.model.IPConstants;
+import org.roda_project.commons_ip2.model.IPContentInformationType;
 import org.roda_project.commons_ip2.model.IPContentType;
 import org.roda_project.commons_ip2.model.MetsWrapper;
 import org.roda_project.commons_ip2.model.SIP;
@@ -50,8 +51,8 @@ public class HungarianSIP extends SIP {
    * @param sipId
    *          will be used as OBJID in METS (/mets[@OBJID])
    */
-  public HungarianSIP(String sipId, IPContentType contentType) {
-    super(sipId, contentType);
+  public HungarianSIP(String sipId, IPContentType contentType, IPContentInformationType contentInformationType) {
+    super(sipId, contentType, contentInformationType);
   }
 
   public String getFolderTemplate() {

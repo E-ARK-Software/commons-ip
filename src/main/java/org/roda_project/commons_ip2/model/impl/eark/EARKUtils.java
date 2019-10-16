@@ -18,15 +18,17 @@ import java.util.Optional;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.roda_project.commons_ip2.mets_v1_11.beans.DivType;
-import org.roda_project.commons_ip2.mets_v1_11.beans.DivType.Fptr;
-import org.roda_project.commons_ip2.mets_v1_11.beans.DivType.Mptr;
-import org.roda_project.commons_ip2.mets_v1_11.beans.FileType;
-import org.roda_project.commons_ip2.mets_v1_11.beans.FileType.FLocat;
-import org.roda_project.commons_ip2.mets_v1_11.beans.MdSecType.MdRef;
-import org.roda_project.commons_ip2.mets_v1_11.beans.Mets;
-import org.roda_project.commons_ip2.mets_v1_11.beans.MetsType.MetsHdr.Agent;
-import org.roda_project.commons_ip2.mets_v1_11.beans.StructMapType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.DivType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.DivType.Fptr;
+import org.roda_project.commons_ip2.mets_v1_12.beans.DivType.Mptr;
+import org.roda_project.commons_ip2.mets_v1_12.beans.FileGrpType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.FileType.FLocat;
+import org.roda_project.commons_ip2.mets_v1_12.beans.MdSecType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.MdSecType.MdRef;
+import org.roda_project.commons_ip2.mets_v1_12.beans.Mets;
+import org.roda_project.commons_ip2.mets_v1_12.beans.MetsType.MetsHdr.Agent;
+import org.roda_project.commons_ip2.mets_v1_12.beans.StructMapType;
 import org.roda_project.commons_ip2.model.AIP;
 import org.roda_project.commons_ip2.model.IPConstants;
 import org.roda_project.commons_ip2.model.IPContentType;
@@ -39,7 +41,6 @@ import org.roda_project.commons_ip2.model.IPRepresentation;
 import org.roda_project.commons_ip2.model.MetadataType;
 import org.roda_project.commons_ip2.model.MetsWrapper;
 import org.roda_project.commons_ip2.model.ParseException;
-import org.roda_project.commons_ip2.model.RepresentationContentType;
 import org.roda_project.commons_ip2.model.RepresentationStatus;
 import org.roda_project.commons_ip2.model.SIP;
 import org.roda_project.commons_ip2.model.ValidationEntry;
@@ -145,13 +146,12 @@ public final class EARKUtils {
         }
         String representationId = representation.getObjectID();
         // 20160407 hsilva: not being used by Common Specification v0.13
-        String representationProfile = "";
-        String representationContentType = representation.getContentType().asString();
 
         IPHeader header = new IPHeader(IPEnums.IPStatus.NEW).setAgents(representation.getAgents());
         MetsWrapper representationMETSWrapper = EARKMETSUtils.generateMETS(representationId,
-          representation.getDescription(), representationProfile, false, Optional.empty(), null, header,
-          mainMETSWrapper.getMets().getOAISPACKAGETYPE(), representationContentType);
+          representation.getDescription(), ip.getProfile(), false, Optional.empty(), null, header,
+          mainMETSWrapper.getMets().getMetsHdr().getOAISPACKAGETYPE(), representation.getContentType(),
+          representation.getContentInformationType());
         representationMETSWrapper.getMainDiv().setTYPE(representation.getStatus().asString());
 
         // representation data
@@ -272,6 +272,9 @@ public final class EARKUtils {
       Path earkCsipSchema = Utils.copyResourceFromClasspathToDir(EARKSIP.class, buildDir,
         IPConstants.SCHEMA_EARK_CSIP_FILENAME, IPConstants.SCHEMA_EARK_CSIP_RELATIVE_PATH_FROM_RESOURCES);
       schemas.add(new IPFile(earkCsipSchema, IPConstants.SCHEMA_EARK_CSIP_FILENAME));
+      Path earkSipSchema = Utils.copyResourceFromClasspathToDir(EARKSIP.class, buildDir,
+        IPConstants.SCHEMA_EARK_SIP_FILENAME, IPConstants.SCHEMA_EARK_SIP_RELATIVE_PATH_FROM_RESOURCES);
+      schemas.add(new IPFile(earkSipSchema, IPConstants.SCHEMA_EARK_SIP_FILENAME));
       Path metsSchema = Utils.copyResourceFromClasspathToDir(EARKSIP.class, buildDir,
         IPConstants.SCHEMA_METS_FILENAME_WITH_VERSION, IPConstants.SCHEMA_METS_RELATIVE_PATH_FROM_RESOURCES);
       schemas.add(new IPFile(metsSchema, IPConstants.SCHEMA_METS_FILENAME_WITH_VERSION));
@@ -327,7 +330,7 @@ public final class EARKUtils {
   }
 
   protected static void setIPContentType(Mets mets, IPInterface ip) throws ParseException {
-    String oaisPackageType = mets.getOAISPACKAGETYPE();
+    String oaisPackageType = mets.getMetsHdr().getOAISPACKAGETYPE();
 
     if (StringUtils.isBlank(oaisPackageType)) {
       throw new ParseException("METS 'OAISPACKAGETYPE' attribute does not contain any value");
@@ -356,9 +359,9 @@ public final class EARKUtils {
     if (mets.getMetsHdr() != null && mets.getMetsHdr().getAgent() != null) {
       for (Agent agent : mets.getMetsHdr().getAgent()) {
         if (representation == null) {
-          ip.addAgent(EARKMETSUtils.createIPAgent(agent));
+          ip.addAgent(EARKMETSUtils.createIPAgent(ip, agent));
         } else {
-          representation.addAgent(EARKMETSUtils.createIPAgent(agent));
+          representation.addAgent(EARKMETSUtils.createIPAgent(ip, agent));
         }
       }
     }
@@ -389,6 +392,7 @@ public final class EARKUtils {
     return new MetsWrapper(representationMets, representationMetsFile);
   }
 
+  // FIXME review this
   protected static void setRepresentationContentType(Mets mets, IPRepresentation representation) throws ParseException {
     String contentType = mets.getCONTENTINFORMATIONTYPE();
     if (StringUtils.isBlank(contentType)) {
@@ -399,53 +403,57 @@ public final class EARKUtils {
       contentType = mets.getOTHERCONTENTINFORMATIONTYPE();
     }
 
-    representation.setContentType(new RepresentationContentType(contentType));
+    representation.setContentType(new IPContentType(contentType));
   }
 
   protected static IPInterface processRepresentations(MetsWrapper metsWrapper, IPInterface ip, Logger logger)
     throws IPException {
 
-    if (metsWrapper.getRepresentationsDiv() != null && metsWrapper.getRepresentationsDiv().getDiv() != null) {
-      for (DivType representationDiv : metsWrapper.getRepresentationsDiv().getDiv()) {
-        if (representationDiv.getMptr() != null && !representationDiv.getMptr().isEmpty()) {
-          // we can assume one and only one mets for each representation div
-          Mptr mptr = representationDiv.getMptr().get(0);
-          String href = Utils.extractedRelativePathFromHref(mptr.getHref());
-          Path metsFilePath = ip.getBasePath().resolve(href);
-          IPRepresentation representation = new IPRepresentation(representationDiv.getLABEL());
-          MetsWrapper representationMetsWrapper = processRepresentationMets(ip, metsFilePath, representation);
+    if (metsWrapper.getMainDiv() != null && metsWrapper.getMainDiv().getDiv() != null) {
+      for (DivType div : metsWrapper.getMainDiv().getDiv()) {
+        if (div.getLABEL().startsWith(IPConstants.REPRESENTATIONS_WITH_FIRST_LETTER_CAPITAL)) {
+          if (div.getMptr() != null && !div.getMptr().isEmpty()) {
+            // we can assume one and only one mets for each representation div
+            Mptr mptr = div.getMptr().get(0);
+            String href = Utils.extractedRelativePathFromHref(mptr.getHref());
+            Path metsFilePath = ip.getBasePath().resolve(href);
+            IPRepresentation representation = new IPRepresentation(
+              div.getLABEL().replaceFirst(IPConstants.REPRESENTATIONS_WITH_FIRST_LETTER_CAPITAL + "/", ""));
+            MetsWrapper representationMetsWrapper = processRepresentationMets(ip, metsFilePath, representation);
 
-          if (representationMetsWrapper.getMets() != null) {
-            Path representationBasePath = metsFilePath.getParent();
+            if (representationMetsWrapper.getMets() != null) {
+              Path representationBasePath = metsFilePath.getParent();
 
-            StructMapType representationStructMap = getEARKStructMap(representationMetsWrapper, ip, false);
-            if (representationStructMap != null) {
+              StructMapType representationStructMap = getEARKStructMap(representationMetsWrapper, ip, false);
+              if (representationStructMap != null) {
 
-              preProcessStructMap(representationMetsWrapper, representationStructMap);
-              representation.setStatus(new RepresentationStatus(representationMetsWrapper.getMainDiv().getTYPE()));
-              ip.addRepresentation(representation);
+                preProcessStructMap(representationMetsWrapper, representationStructMap);
+                representation.setStatus(new RepresentationStatus(representationMetsWrapper.getMainDiv().getTYPE()));
+                ip.addRepresentation(representation);
 
-              // process representation agents
-              processRepresentationAgents(representationMetsWrapper, representation);
+                // process representation agents
+                processRepresentationAgents(representationMetsWrapper, representation);
 
-              // process files
-              processRepresentationFiles(ip, representationMetsWrapper, representation, representationBasePath);
+                // process files
+                processRepresentationFiles(ip, representationMetsWrapper, representation, representationBasePath);
 
-              // process descriptive metadata
-              processDescriptiveMetadata(representationMetsWrapper, ip, logger, representation, representationBasePath);
+                // process descriptive metadata
+                processDescriptiveMetadata(representationMetsWrapper, ip, logger, representation,
+                  representationBasePath);
 
-              // process preservation metadata
-              processPreservationMetadata(representationMetsWrapper, ip, logger, representation,
-                representationBasePath);
+                // process preservation metadata
+                processPreservationMetadata(representationMetsWrapper, ip, logger, representation,
+                  representationBasePath);
 
-              // process other metadata
-              processOtherMetadata(representationMetsWrapper, ip, logger, representation, representationBasePath);
+                // process other metadata
+                processOtherMetadata(representationMetsWrapper, ip, logger, representation, representationBasePath);
 
-              // process schemas
-              processSchemasMetadata(representationMetsWrapper, ip, representationBasePath);
+                // process schemas
+                processSchemasMetadata(representationMetsWrapper, ip, representationBasePath);
 
-              // process documentation
-              processDocumentationMetadata(representationMetsWrapper, ip, representationBasePath);
+                // process documentation
+                processDocumentationMetadata(representationMetsWrapper, ip, representationBasePath);
+              }
             }
           }
         }
@@ -454,7 +462,7 @@ public final class EARKUtils {
       // post-process validations
       if (ip.getRepresentations().isEmpty()) {
         ValidationUtils.addIssue(ip.getValidationReport(), ValidationConstants.MAIN_METS_NO_REPRESENTATIONS_FOUND,
-          ValidationEntry.LEVEL.WARN, metsWrapper.getRepresentationsDiv(), ip.getBasePath(), metsWrapper.getMetsPath());
+          ValidationEntry.LEVEL.WARN, metsWrapper.getMainDiv(), ip.getBasePath(), metsWrapper.getMetsPath());
       }
     }
 
@@ -466,8 +474,7 @@ public final class EARKUtils {
     Mets mets = metsWrapper.getMets();
     StructMapType res = null;
     for (StructMapType structMap : mets.getStructMap()) {
-      if (StringUtils.equals(structMap.getLABEL(), IPConstants.COMMON_SPEC_STRUCTURAL_MAP)
-        || StringUtils.equals(structMap.getLABEL(), IPConstants.E_ARK_STRUCTURAL_MAP)) {
+      if (StringUtils.equals(structMap.getLABEL(), IPConstants.COMMON_SPEC_STRUCTURAL_MAP)) {
         res = structMap;
         break;
       }
@@ -488,22 +495,14 @@ public final class EARKUtils {
 
   protected static void preProcessStructMap(MetsWrapper metsWrapper, StructMapType structMap) {
 
-    DivType aipDiv = structMap.getDiv();
-    if (aipDiv.getDiv() != null) {
-      metsWrapper.setMainDiv(aipDiv);
-      for (DivType firstLevel : aipDiv.getDiv()) {
+    DivType ipDiv = structMap.getDiv();
+    if (ipDiv.getDiv() != null) {
+      metsWrapper.setMainDiv(ipDiv);
+      for (DivType firstLevel : ipDiv.getDiv()) {
         if (IPConstants.METADATA.equalsIgnoreCase(firstLevel.getLABEL()) && firstLevel.getDiv() != null) {
-          for (DivType secondLevel : firstLevel.getDiv()) {
-            if (IPConstants.DESCRIPTIVE.equalsIgnoreCase(secondLevel.getLABEL())) {
-              metsWrapper.setDescriptiveMetadataDiv(secondLevel);
-            } else if (IPConstants.PRESERVATION.equalsIgnoreCase(secondLevel.getLABEL())) {
-              metsWrapper.setPreservationMetadataDiv(secondLevel);
-            } else if (IPConstants.OTHER.equalsIgnoreCase(secondLevel.getLABEL())) {
-              metsWrapper.setOtherMetadataDiv(secondLevel);
-            }
-          }
-        } else if (IPConstants.REPRESENTATIONS.equalsIgnoreCase(firstLevel.getLABEL())) {
-          metsWrapper.setRepresentationsDiv(firstLevel);
+          metsWrapper.setMetadataDiv(firstLevel);
+        } else if ((IPConstants.METADATA + "/" + IPConstants.OTHER).equalsIgnoreCase(firstLevel.getLABEL())) {
+          metsWrapper.setOtherMetadataDiv(firstLevel);
         } else if (IPConstants.DATA.equalsIgnoreCase(firstLevel.getLABEL())) {
           metsWrapper.setDataDiv(firstLevel);
         } else if (IPConstants.SCHEMAS.equalsIgnoreCase(firstLevel.getLABEL())) {
@@ -520,7 +519,7 @@ public final class EARKUtils {
   protected static IPInterface processDescriptiveMetadata(MetsWrapper metsWrapper, IPInterface ip, Logger logger,
     IPRepresentation representation, Path basePath) throws IPException {
 
-    return processMetadata(ip, logger, metsWrapper, representation, metsWrapper.getDescriptiveMetadataDiv(),
+    return processMetadata(ip, logger, metsWrapper, representation, metsWrapper.getMetadataDiv(),
       IPConstants.DESCRIPTIVE, basePath);
   }
 
@@ -534,32 +533,41 @@ public final class EARKUtils {
   protected static IPInterface processPreservationMetadata(MetsWrapper metsWrapper, IPInterface ip, Logger logger,
     IPRepresentation representation, Path basePath) throws IPException {
 
-    return processMetadata(ip, logger, metsWrapper, representation, metsWrapper.getPreservationMetadataDiv(),
+    return processMetadata(ip, logger, metsWrapper, representation, metsWrapper.getMetadataDiv(),
       IPConstants.PRESERVATION, basePath);
   }
 
   protected static IPInterface processMetadata(IPInterface ip, Logger logger, MetsWrapper representationMetsWrapper,
     IPRepresentation representation, DivType div, String metadataType, Path basePath) throws IPException {
-    if (div != null && div.getFptr() != null) {
-      for (Fptr fptr : div.getFptr()) {
-        MdRef mdRef = (MdRef) fptr.getFILEID();
-        String href = Utils.extractedRelativePathFromHref(mdRef);
-        Path filePath = basePath.resolve(href);
-        if (Files.exists(filePath)) {
-          List<String> fileRelativeFolders = Utils
-            .getFileRelativeFolders(basePath.resolve(IPConstants.METADATA).resolve(metadataType), filePath);
+    if (div != null) {
+      List<Object> objects = null;
+      if (IPConstants.DESCRIPTIVE.equals(metadataType) || IPConstants.OTHER.equals(metadataType)) {
+        objects = div.getDMDID();
+      } else if (IPConstants.PRESERVATION.equals(metadataType)) {
+        objects = div.getADMID();
+      }
 
-          processMetadataFile(ip, logger, representation, metadataType, mdRef, filePath, fileRelativeFolders);
-        } else {
-          ValidationUtils.addIssue(ip.getValidationReport(),
-            ValidationConstants.getMetadataFileNotFoundString(metadataType), ValidationEntry.LEVEL.ERROR,
-            ip.getBasePath(), filePath);
+      if (objects != null) {
+        for (Object obj : objects) {
+          if (obj instanceof MdSecType) {
+            MdRef mdRef = ((MdSecType) obj).getMdRef();
+            if (mdRef != null) {
+              String href = Utils.extractedRelativePathFromHref(mdRef);
+              Path filePath = basePath.resolve(href);
+              if (Files.exists(filePath)) {
+                List<String> fileRelativeFolders = Utils
+                  .getFileRelativeFolders(basePath.resolve(IPConstants.METADATA).resolve(metadataType), filePath);
+
+                processMetadataFile(ip, logger, representation, metadataType, mdRef, filePath, fileRelativeFolders);
+              } else {
+                ValidationUtils.addIssue(ip.getValidationReport(),
+                  ValidationConstants.getMetadataFileNotFoundString(metadataType), ValidationEntry.LEVEL.ERROR,
+                  ip.getBasePath(), filePath);
+              }
+            }
+          }
         }
       }
-    } else {
-      ValidationUtils.addIssue(ip.getValidationReport(),
-        ValidationConstants.getMetadataFileFptrNotFoundString(metadataType), ValidationEntry.LEVEL.ERROR,
-        ip.getBasePath(), representationMetsWrapper.getMetsPath());
     }
 
     return ip;
@@ -633,45 +641,50 @@ public final class EARKUtils {
     throws IPException {
     if (div != null && div.getFptr() != null) {
       for (Fptr fptr : div.getFptr()) {
-        FileType fileType = (FileType) fptr.getFILEID();
+        Object object = fptr.getFILEID();
+        if (object instanceof FileGrpType) {
+          FileGrpType fileGrp = ((FileGrpType) object);
+          for (FileType fileType : fileGrp.getFile()) {
+            if (fileType.getFLocat() != null) {
+              FLocat fLocat = fileType.getFLocat().get(0);
+              String href = Utils.extractedRelativePathFromHref(fLocat.getHref());
+              Path filePath = basePath.resolve(href);
 
-        if (fileType.getFLocat() != null) {
-          FLocat fLocat = fileType.getFLocat().get(0);
-          String href = Utils.extractedRelativePathFromHref(fLocat.getHref());
-          Path filePath = basePath.resolve(href);
+              if (Files.exists(filePath)) {
+                List<String> fileRelativeFolders = Utils.getFileRelativeFolders(basePath.resolve(folder), filePath);
+                Optional<IPFile> file = validateFile(ip, filePath, fileType, fileRelativeFolders);
 
-          if (Files.exists(filePath)) {
-            List<String> fileRelativeFolders = Utils.getFileRelativeFolders(basePath.resolve(folder), filePath);
-            Optional<IPFile> file = validateFile(ip, filePath, fileType, fileRelativeFolders);
-
-            if (file.isPresent()) {
-              if (IPConstants.SCHEMAS.equalsIgnoreCase(folder)) {
-                ValidationUtils.addInfo(ip.getValidationReport(),
-                  ValidationConstants.SCHEMA_FILE_FOUND_WITH_MATCHING_CHECKSUMS, ip.getBasePath(), filePath);
-                ip.addSchema(file.get());
-              } else if (IPConstants.DOCUMENTATION.equalsIgnoreCase(folder)) {
-                ValidationUtils.addInfo(ip.getValidationReport(),
-                  ValidationConstants.DOCUMENTATION_FILE_FOUND_WITH_MATCHING_CHECKSUMS, ip.getBasePath(), filePath);
-                ip.addDocumentation(file.get());
-              } else if (IPConstants.SUBMISSION.equalsIgnoreCase(folder) && ip instanceof AIP) {
-                ValidationUtils.addInfo(ip.getValidationReport(),
-                  ValidationConstants.SUBMISSION_FILE_FOUND_WITH_MATCHING_CHECKSUMS, ip.getBasePath(), filePath);
-                ((AIP) ip).addSubmission(file.get());
+                if (file.isPresent()) {
+                  if (IPConstants.SCHEMAS.equalsIgnoreCase(folder)) {
+                    ValidationUtils.addInfo(ip.getValidationReport(),
+                      ValidationConstants.SCHEMA_FILE_FOUND_WITH_MATCHING_CHECKSUMS, ip.getBasePath(), filePath);
+                    ip.addSchema(file.get());
+                  } else if (IPConstants.DOCUMENTATION.equalsIgnoreCase(folder)) {
+                    ValidationUtils.addInfo(ip.getValidationReport(),
+                      ValidationConstants.DOCUMENTATION_FILE_FOUND_WITH_MATCHING_CHECKSUMS, ip.getBasePath(), filePath);
+                    ip.addDocumentation(file.get());
+                  } else if (IPConstants.SUBMISSION.equalsIgnoreCase(folder) && ip instanceof AIP) {
+                    ValidationUtils.addInfo(ip.getValidationReport(),
+                      ValidationConstants.SUBMISSION_FILE_FOUND_WITH_MATCHING_CHECKSUMS, ip.getBasePath(), filePath);
+                    ((AIP) ip).addSubmission(file.get());
+                  }
+                }
+              } else {
+                if (IPConstants.SCHEMAS.equalsIgnoreCase(folder)) {
+                  ValidationUtils.addIssue(ip.getValidationReport(), ValidationConstants.SCHEMA_FILE_NOT_FOUND,
+                    ValidationEntry.LEVEL.ERROR, div, ip.getBasePath(), filePath);
+                } else if (IPConstants.DOCUMENTATION.equalsIgnoreCase(folder)) {
+                  ValidationUtils.addIssue(ip.getValidationReport(), ValidationConstants.DOCUMENTATION_FILE_NOT_FOUND,
+                    ValidationEntry.LEVEL.ERROR, div, ip.getBasePath(), filePath);
+                } else if (IPConstants.SUBMISSION.equalsIgnoreCase(folder)) {
+                  ValidationUtils.addIssue(ip.getValidationReport(), ValidationConstants.SUBMISSION_FILE_NOT_FOUND,
+                    ValidationEntry.LEVEL.ERROR, div, ip.getBasePath(), filePath);
+                }
               }
-            }
-          } else {
-            if (IPConstants.SCHEMAS.equalsIgnoreCase(folder)) {
-              ValidationUtils.addIssue(ip.getValidationReport(), ValidationConstants.SCHEMA_FILE_NOT_FOUND,
-                ValidationEntry.LEVEL.ERROR, div, ip.getBasePath(), filePath);
-            } else if (IPConstants.DOCUMENTATION.equalsIgnoreCase(folder)) {
-              ValidationUtils.addIssue(ip.getValidationReport(), ValidationConstants.DOCUMENTATION_FILE_NOT_FOUND,
-                ValidationEntry.LEVEL.ERROR, div, ip.getBasePath(), filePath);
-            } else if (IPConstants.SUBMISSION.equalsIgnoreCase(folder)) {
-              ValidationUtils.addIssue(ip.getValidationReport(), ValidationConstants.SUBMISSION_FILE_NOT_FOUND,
-                ValidationEntry.LEVEL.ERROR, div, ip.getBasePath(), filePath);
             }
           }
         }
+
       }
     }
 
@@ -688,29 +701,33 @@ public final class EARKUtils {
 
     if (representationMetsWrapper.getDataDiv() != null && representationMetsWrapper.getDataDiv().getFptr() != null) {
       for (Fptr fptr : representationMetsWrapper.getDataDiv().getFptr()) {
-        FileType fileType = (FileType) fptr.getFILEID();
+        Object object = fptr.getFILEID();
+        if (object instanceof FileGrpType) {
+          FileGrpType fileGrp = ((FileGrpType) object);
+          for (FileType fileType : fileGrp.getFile()) {
+            if (fileType != null && fileType.getFLocat() != null) {
+              FLocat fLocat = fileType.getFLocat().get(0);
+              String href = Utils.extractedRelativePathFromHref(fLocat.getHref());
+              Path filePath = representationBasePath.resolve(href);
+              if (Files.exists(filePath)) {
+                List<String> fileRelativeFolders = Utils
+                  .getFileRelativeFolders(representationBasePath.resolve(IPConstants.DATA), filePath);
+                Optional<IPFile> file = validateFile(ip, filePath, fileType, fileRelativeFolders);
 
-        if (fileType != null && fileType.getFLocat() != null) {
-          FLocat fLocat = fileType.getFLocat().get(0);
-          String href = Utils.extractedRelativePathFromHref(fLocat.getHref());
-          Path filePath = representationBasePath.resolve(href);
-          if (Files.exists(filePath)) {
-            List<String> fileRelativeFolders = Utils
-              .getFileRelativeFolders(representationBasePath.resolve(IPConstants.DATA), filePath);
-            Optional<IPFile> file = validateFile(ip, filePath, fileType, fileRelativeFolders);
-
-            if (file.isPresent()) {
-              representation.addFile(file.get());
-              ValidationUtils.addInfo(ip.getValidationReport(),
-                ValidationConstants.REPRESENTATION_FILE_FOUND_WITH_MATCHING_CHECKSUMS, ip.getBasePath(), filePath);
+                if (file.isPresent()) {
+                  representation.addFile(file.get());
+                  ValidationUtils.addInfo(ip.getValidationReport(),
+                    ValidationConstants.REPRESENTATION_FILE_FOUND_WITH_MATCHING_CHECKSUMS, ip.getBasePath(), filePath);
+                }
+              } else {
+                ValidationUtils.addIssue(ip.getValidationReport(), ValidationConstants.REPRESENTATION_FILE_NOT_FOUND,
+                  ValidationEntry.LEVEL.ERROR, ip.getBasePath(), filePath);
+              }
+            } else {
+              ValidationUtils.addIssue(ip.getValidationReport(), ValidationConstants.REPRESENTATION_FILE_HAS_NO_FLOCAT,
+                ValidationEntry.LEVEL.ERROR, fileType, ip.getBasePath(), representationMetsWrapper.getMetsPath());
             }
-          } else {
-            ValidationUtils.addIssue(ip.getValidationReport(), ValidationConstants.REPRESENTATION_FILE_NOT_FOUND,
-              ValidationEntry.LEVEL.ERROR, ip.getBasePath(), filePath);
           }
-        } else {
-          ValidationUtils.addIssue(ip.getValidationReport(), ValidationConstants.REPRESENTATION_FILE_HAS_NO_FLOCAT,
-            ValidationEntry.LEVEL.ERROR, fileType, ip.getBasePath(), representationMetsWrapper.getMetsPath());
         }
       }
 

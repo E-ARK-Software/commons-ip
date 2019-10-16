@@ -20,11 +20,11 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.roda_project.commons_ip2.mets_v1_11.beans.DivType;
-import org.roda_project.commons_ip2.mets_v1_11.beans.FileType;
-import org.roda_project.commons_ip2.mets_v1_11.beans.MdSecType;
-import org.roda_project.commons_ip2.mets_v1_11.beans.MdSecType.MdWrap;
-import org.roda_project.commons_ip2.mets_v1_11.beans.MdSecType.MdWrap.XmlData;
+import org.roda_project.commons_ip2.mets_v1_12.beans.DivType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.MdSecType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.MdSecType.MdWrap;
+import org.roda_project.commons_ip2.mets_v1_12.beans.MdSecType.MdWrap.XmlData;
 import org.roda_project.commons_ip2.model.IPConstants;
 import org.roda_project.commons_ip2.model.IPDescriptiveMetadata;
 import org.roda_project.commons_ip2.model.IPFile;

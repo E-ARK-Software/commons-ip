@@ -1,6 +1,6 @@
 # E-ARK IP manipulation java library
 
-API to manipulate OAIS Information Packages of different formats: E-ARK, BagIt, Hungarian type 4 SIP.
+API to manipulate OAIS Information Packages of different formats: E-ARK (version 1 & 2 in alpha stage), BagIt, Hungarian type 4 SIP.
 
 The E-ARK Information Packages are maintained by the Digital Information LifeCycle Interoperability Standards Board (DILCIS Board).  DILCIS Board is an international group of experts committed to maintain and sustain maintain a set of interoperability specifications which allow for the transfer, long-term preservation, and reuse of digital information regardless of the origin or type of the information.
 
@@ -172,7 +172,7 @@ The changes are:
 * `src/main/resources/schemas2/mets1_12.xjb` Bindings file created to deal with attribute name conflict between METS and XLink Schemas
 
 After Java classes are created, some changes were made to produce METS XML files well defined in terms of namespaces. Namely:
-* `src/main/java/org/roda_project/commons_ip2/mets_v1_11/beans/package-info.java` Annotations for corretly generate namespaces were added. Following is the before & then the after:
+* `src/main/java/org/roda_project/commons_ip2/mets_v1_12/beans/package-info.java` Annotations for corretly generate namespaces were added. Following is the before & then the after:
 ```
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.loc.gov/METS/", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 ```
@@ -188,7 +188,7 @@ and the after
 #### How to generate/update XML Beans
 
 ```
-xjc [-npa] -d src/main/java/ -p "org.roda_project.commons_ip2.mets_v1_11.beans" src/main/resources/schemas2/mets1_12.xsd -b src/main/resources/schemas2/mets1_12.xjb
+xjc [-npa] -d src/main/java/ -p "org.roda_project.commons_ip2.mets_v1_12.beans" src/main/resources/schemas2/mets1_12.xsd -b src/main/resources/schemas2/mets1_12.xjb
 ```
 
 ## Contributing

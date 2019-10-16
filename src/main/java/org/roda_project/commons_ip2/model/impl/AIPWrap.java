@@ -17,6 +17,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.roda_project.commons_ip2.model.AIP;
 import org.roda_project.commons_ip2.model.IP;
 import org.roda_project.commons_ip2.model.IPAgent;
+import org.roda_project.commons_ip2.model.IPContentInformationType;
 import org.roda_project.commons_ip2.model.IPContentType;
 import org.roda_project.commons_ip2.model.IPDescriptiveMetadata;
 import org.roda_project.commons_ip2.model.IPFile;
@@ -113,6 +114,16 @@ public class AIPWrap implements AIP {
   @Override
   public IPContentType getContentType() {
     return aip.getContentType();
+  }
+
+  @Override
+  public IP setContentInformationType(IPContentInformationType contentInformationType) {
+    return aip.setContentInformationType(contentInformationType);
+  }
+
+  @Override
+  public IPContentInformationType getContentInformationType() {
+    return aip.getContentInformationType();
   }
 
   @Override

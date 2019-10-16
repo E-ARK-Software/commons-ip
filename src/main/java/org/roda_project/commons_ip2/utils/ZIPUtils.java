@@ -30,9 +30,9 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.io.IOUtils;
-import org.roda_project.commons_ip2.mets_v1_11.beans.FileType;
-import org.roda_project.commons_ip2.mets_v1_11.beans.Mets;
-import org.roda_project.commons_ip2.mets_v1_11.beans.MdSecType.MdRef;
+import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.Mets;
+import org.roda_project.commons_ip2.mets_v1_12.beans.MdSecType.MdRef;
 import org.roda_project.commons_ip2.model.IPConstants;
 import org.roda_project.commons_ip2.model.ParseException;
 import org.roda_project.commons_ip2.model.SIP;
@@ -95,8 +95,8 @@ public final class ZIPUtils {
   }
 
   public static Map<String, ZipEntryInfo> addMETSFileToZip(Map<String, ZipEntryInfo> zipEntries, Path filePath,
-    String zipPath, Mets mets, boolean rootMETS) throws IPException {
-    zipEntries.put(zipPath, new METSZipEntryInfo(zipPath, filePath, mets, rootMETS));
+    String zipPath, Mets mets, boolean rootMETS, FileType fileType) throws IPException {
+    zipEntries.put(zipPath, new METSZipEntryInfo(zipPath, filePath, mets, rootMETS, fileType));
     return zipEntries;
   }
 
@@ -137,9 +137,8 @@ public final class ZIPUtils {
       }
 
       zos.putNextEntry(entry);
-      InputStream inputStream = Files.newInputStream(file.getFilePath());
 
-      try {
+      try (InputStream inputStream = Files.newInputStream(file.getFilePath());) {
         Map<String, String> checksums;
         if (file instanceof METSZipEntryInfo) {
           checksums = calculateChecksums(Optional.of(zos), inputStream, metsChecksumAlgorithms);
@@ -168,7 +167,6 @@ public final class ZIPUtils {
         LOGGER.error("Error while zipping files", e);
       }
       zos.closeEntry();
-      inputStream.close();
       i++;
 
       sip.notifySipBuildPackagingCurrentStatus(i);

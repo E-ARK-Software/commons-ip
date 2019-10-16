@@ -9,10 +9,10 @@ package org.roda_project.commons_ip2.model;
 
 import java.nio.file.Path;
 
-import org.roda_project.commons_ip2.mets_v1_11.beans.DivType;
-import org.roda_project.commons_ip2.mets_v1_11.beans.FileGrpType;
-import org.roda_project.commons_ip2.mets_v1_11.beans.MdSecType;
-import org.roda_project.commons_ip2.mets_v1_11.beans.Mets;
+import org.roda_project.commons_ip2.mets_v1_12.beans.DivType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.FileGrpType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.MdSecType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.Mets;
 
 public class MetsWrapper {
 
@@ -20,10 +20,8 @@ public class MetsWrapper {
   private Path metsPath;
 
   private DivType mainDiv;
-  private DivType descriptiveMetadataDiv;
-  private DivType preservationMetadataDiv;
+  private DivType metadataDiv;
   private DivType otherMetadataDiv;
-  private DivType representationsDiv;
   private DivType dataDiv;
   private DivType schemasDiv;
   private DivType submissionsDiv;
@@ -31,7 +29,6 @@ public class MetsWrapper {
 
   private FileGrpType mainFileGroup;
 
-  private FileGrpType representationsFileGroup;
   private FileGrpType schemasFileGroup;
   private FileGrpType submissionFileGroup;
   private FileGrpType documentationFileGroup;
@@ -70,20 +67,12 @@ public class MetsWrapper {
     this.mainDiv = mainDiv;
   }
 
-  public DivType getDescriptiveMetadataDiv() {
-    return descriptiveMetadataDiv;
+  public DivType getMetadataDiv() {
+    return metadataDiv;
   }
 
-  public void setDescriptiveMetadataDiv(DivType descriptiveMetadataDiv) {
-    this.descriptiveMetadataDiv = descriptiveMetadataDiv;
-  }
-
-  public DivType getPreservationMetadataDiv() {
-    return preservationMetadataDiv;
-  }
-
-  public void setPreservationMetadataDiv(DivType preservationMetadataDiv) {
-    this.preservationMetadataDiv = preservationMetadataDiv;
+  public void setMetadataDiv(DivType metadataDiv) {
+    this.metadataDiv = metadataDiv;
   }
 
   public DivType getOtherMetadataDiv() {
@@ -92,22 +81,6 @@ public class MetsWrapper {
 
   public void setOtherMetadataDiv(DivType otherMetadataDiv) {
     this.otherMetadataDiv = otherMetadataDiv;
-  }
-
-  public DivType getRepresentationsDiv() {
-    return representationsDiv;
-  }
-
-  public void setRepresentationsDiv(DivType representationsDiv) {
-    this.representationsDiv = representationsDiv;
-  }
-
-  public FileGrpType getRepresentationsFileGroup() {
-    return representationsFileGroup;
-  }
-
-  public void setRepresentationsFileGroup(FileGrpType representationsFileGroup) {
-    this.representationsFileGroup = representationsFileGroup;
   }
 
   public FileGrpType getSchemasFileGroup() {

@@ -21,7 +21,7 @@ public class IPEnums {
         if (value != null) {
           ret = IPStatus.valueOf(value);
         }
-      } catch (IllegalArgumentException e) {
+      } catch (IllegalArgumentException | NullPointerException e) {
         // do nothing & return default value
       }
       return ret;
